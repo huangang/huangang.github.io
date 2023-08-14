@@ -1,0 +1,62 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta name="generator" content="Hexo 3.9.0"><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> 安装php7 · zorro_ku_o's blog</title><meta name="description" content="安装php7 - zorro_ku_o"><meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="X-Frame-Options" content="deny"><link rel="short icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">博客</a></li><li class="nav-list-item"><a href="/about.html" target="_self" class="nav-list-link">关于</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">归档</a></li><li class="nav-list-item"><a href="http://weibo.com/zhanghuangang/" target="_blank" class="nav-list-link">微博</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><section class="container"><div class="post"><article class="post-block"><h1 class="post-title">安装php7</h1><div class="post-info">2015年12月9日</div><div class="post-content"><h3 id="操作系统"><a href="#操作系统" class="headerlink" title="操作系统"></a>操作系统</h3><p>centos6.5 cpu 1核 内存1GB(腾讯云)</p>
+<h3 id="扩展yum源"><a href="#扩展yum源" class="headerlink" title="扩展yum源"></a>扩展yum源</h3><p><code>wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm</code><br><code>wget https://centos6.iuscommunity.org/ius-release.rpm</code><br><code>rpm -ivh epel-release-latest-6.noarch.rpm</code><br><code>rpm -ivh ius-release.rpm</code></p>
+<a id="more"></a>
+<h3 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖"></a>安装依赖</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install -y gcc gcc-c++  make zlib zlib-devel pcre pcre-devel  libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel libxml2 libxml2-devel glibc glibc-devel glib2 glib2-devel bzip2 bzip2-devel ncurses ncurses-devel curl curl-devel e2fsprogs e2fsprogs-devel krb5 krb5-devel openssl openssl-devel openldap openldap-devel nss_ldap openldap-clients openldap-servers bison</span><br></pre></td></tr></table></figure>
+
+<h3 id="下载php7源码"><a href="#下载php7源码" class="headerlink" title="下载php7源码"></a>下载php7源码</h3><p><code>git clone https://git.php.net/repository/php-src.git</code></p>
+<h4 id="进入项目"><a href="#进入项目" class="headerlink" title="进入项目"></a>进入项目</h4><p><code>cd php-src</code></p>
+<h4 id="先执行"><a href="#先执行" class="headerlink" title="先执行"></a>先执行</h4><p><code>./buildconf</code></p>
+<h4 id="在执行"><a href="#在执行" class="headerlink" title="在执行"></a>在执行</h4><p><code>./configure --prefix=/usr/local/php7 \
+--with-config-file-path=/usr/local/php7/etc \
+--with-mcrypt=/usr/include \
+--with-mysql=mysqlnd \
+--with-mysqli=mysqlnd \
+--with-pdo-mysql=mysqlnd \
+--with-gd \
+--with-iconv \
+--with-zlib \
+--enable-xml \
+--enable-bcmath \
+--enable-shmop \
+--enable-sysvsem \
+--enable-inline-optimization \
+--enable-mbregex \
+--enable-fpm \
+--enable-mbstring \
+--enable-ftp \
+--enable-gd-native-ttf \
+--with-openssl \
+--enable-pcntl \
+--enable-sockets \
+--with-xmlrpc \
+--enable-zip \
+--enable-soap \
+--without-pear \
+--with-gettext \
+--enable-session \
+--with-curl \
+--with-jpeg-dir \
+--with-freetype-dir \
+--enable-opcache</code></p>
+<h4 id="建立软连接把执行程序链到默认目录"><a href="#建立软连接把执行程序链到默认目录" class="headerlink" title="建立软连接把执行程序链到默认目录"></a>建立软连接把执行程序链到默认目录</h4><p><code>ln -s /usr/local/php/bin/php /usr/bin/php</code></p>
+<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><p><code>cp php.ini-production /usr/local/php/etc/php.ini</code><br><code>cp sapi/fpm/init.d.php-fpm /etc/init.d/php-fpm</code><br><code>chmod +x /etc/init.d/php-fpm</code><br><code>cp /usr/local/php/etc/php-fpm.conf.default   /usr/local/php/etc/php-fpm.conf</code><br><code>cp /usr/local/php/etc/php-fpm.d/www.conf.default /usr/local/php/etc/php-fpm.d/www.conf</code></p>
+<h4 id="配置opcache"><a href="#配置opcache" class="headerlink" title="配置opcache"></a>配置opcache</h4><p><code>vim /usr/local/php/etc/php.ini</code></p>
+<h4 id="加入"><a href="#加入" class="headerlink" title="加入"></a>加入</h4><p><code>zend_extension=opcache.so</code></p>
+<h3 id="安装nginx"><a href="#安装nginx" class="headerlink" title="安装nginx"></a>安装nginx</h3><p><code>wget http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm</code><br><code>rpm ivh nginx-release-centos-6-0.el6.ngx.noarch.rpm</code><br><code>yum install nginx</code></p>
+<h4 id="修改"><a href="#修改" class="headerlink" title="修改"></a>修改</h4><p><code>vim /usr/local/php/etc/php-fpm.d/www.conf</code><br><code>user = nginx</code><br><code>group = nginx</code></p>
+<h4 id="启动nginx"><a href="#启动nginx" class="headerlink" title="启动nginx"></a>启动nginx</h4><p><code>/etc/init.d/php-fpm start</code></p>
+<p>配置php与nginx    </p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">server</span> &#123;</span><br><span class="line">  </span><br><span class="line">    <span class="attribute">listen</span>       <span class="number">80</span>;</span><br><span class="line">    <span class="attribute">server_name</span>  tx.pupued.com;</span><br><span class="line"></span><br><span class="line">    <span class="attribute">root</span>   /var/www;</span><br><span class="line">    <span class="attribute">location</span> / &#123;</span><br><span class="line">        <span class="attribute">index</span> index.html index.htm index.php;</span><br><span class="line">        <span class="attribute">if</span> (!-e <span class="variable">$request_filename</span>) &#123;</span><br><span class="line">            <span class="attribute">rewrite</span> . /index.php <span class="literal">last</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="attribute">location</span> <span class="regexp">~ \.php$</span> &#123;</span><br><span class="line">        <span class="attribute">fastcgi_pass</span>   <span class="number">127.0.0.1:9000</span>;</span><br><span class="line">        <span class="attribute">fastcgi_index</span>  index.php;</span><br><span class="line">        <span class="attribute">fastcgi_param</span>  SCRIPT_FILENAME  <span class="variable">$document_root</span><span class="variable">$fastcgi_script_name</span>;</span><br><span class="line">        <span class="attribute">include</span>        fastcgi_params;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment"># deny access to .htaccess files, if Apache's document root</span></span><br><span class="line">    <span class="comment"># concurs with nginx's one</span></span><br><span class="line">    <span class="comment">#</span></span><br><span class="line">    <span class="attribute">location</span> <span class="regexp">~ /\.ht</span> &#123;</span><br><span class="line">        <span class="attribute">deny</span>  all;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h3><p><code>service nginx start</code></p>
+<h3 id="安装php7-redis-扩展"><a href="#安装php7-redis-扩展" class="headerlink" title="安装php7 redis  扩展"></a>安装php7 redis  扩展</h3><p><code>wget https://github.com/phpredis/phpredis/archive/php7.zip</code><br><code>unzip php7</code><br><code>cd phpredis-php7</code><br><code>/usr/local/php/bin/phpize</code><br><code>./configure  --with-php-config=/usr/local/php/bin/php-config</code><br><code>make  &amp;&amp;  make  install</code>    </p>
+<h4 id="然后修改php-ini文件增加一行："><a href="#然后修改php-ini文件增加一行：" class="headerlink" title="然后修改php.ini文件增加一行："></a>然后修改php.ini文件增加一行：</h4><p><code>vim /usr/local/php/etc/php.ini</code><br><code>extension=redis.so</code><br><code>/etc/init.d/php-fpm restart</code>    </p>
+<h6 id="2015-12-09"><a href="#2015-12-09" class="headerlink" title="2015-12-09"></a>2015-12-09</h6></div><div class="tag"></div>标签:[<a href="/tags/centos/">centos</a>,<a href="/tags/php7/">php7</a>,<a href="/tags/centos6/">centos6</a>]</article></div></section><footer><div class="paginator"><a href="/2015/12/10/mac安装docker/" class="prev">上一篇</a><a href="/2015/06/28/MAMP PRO 3.3 安装phpredis 扩展 /" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'blog-huangang-net';
+var disqus_identifier = '2015/12/09/centos6.5 安装php7/';
+var disqus_title = '安装php7';
+var disqus_url = 'http://blog.huangang.net/2015/12/09/centos6.5 安装php7/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//blog-huangang-net.disqus.com/count.js" async></script><div class="copyright"><p>© 2014 - 2023 <a href="http://blog.huangang.net">zorro_ku_o</a>, unless otherwise noted.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.6.1/MathJax.js?config=TeX-MML-AM_CHTML"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-72484043-1",'auto');ga('send','pageview');</script><a href="https://github.com/huangang"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"></a></body></html>

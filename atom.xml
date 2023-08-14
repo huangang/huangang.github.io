@@ -1,0 +1,514 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>zorro_ku_o&#39;s blog</title>
+  
+  <subtitle>Do a man with dreams and for his efforts</subtitle>
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="http://blog.huangang.net/"/>
+  <updated>2023-08-14T01:39:14.057Z</updated>
+  <id>http://blog.huangang.net/</id>
+  
+  <author>
+    <name>zorro_ku_o</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>升级macOS Ventura git 登录失效</title>
+    <link href="http://blog.huangang.net/2023/08/14/%E5%8D%87%E7%BA%A7macOS-Ventura-git-%E7%99%BB%E5%BD%95%E5%A4%B1%E6%95%88/"/>
+    <id>http://blog.huangang.net/2023/08/14/升级macOS-Ventura-git-登录失效/</id>
+    <published>2023-08-14T01:25:34.000Z</published>
+    <updated>2023-08-14T01:39:14.057Z</updated>
+    
+    <content type="html"><![CDATA[<p>最近升级到 macOS Ventura 版本, 导致以前的git ssh都失效。<br>经过查证，macOS Ventura 内置使用了 OpenSSH_9.0p1，根据 OpenSSH 发行说明 可以得知，从 OpenSSH 8.8/8.8p1 版本开始，就默认关闭了 ssh-rsa 算法。那么 macOS Ventura 内置使用的 OpenSSH_9.0p1 也是默认关闭了 ssh-rsa 算法。</p><p>重新启用 RSA/SHA1（临时方案）</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi ~/.ssh/config</span><br></pre></td></tr></table></figure><p>写入</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 在 ~/.ssh/config 文件的对应主机配置里新增2行：</span></span><br><span class="line">Host xxx-host</span><br><span class="line">HostkeyAlgorithms +ssh-rsa</span><br><span class="line">PubkeyAcceptedAlgorithms +ssh-rsa</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;最近升级到 macOS Ventura 版本, 导致以前的git ssh都失效。&lt;br&gt;经过查证，macOS Ventura 内置使用了 OpenSSH_9.0p1，根据 OpenSSH 发行说明 可以得知，从 OpenSSH 8.8/8.8p1 版本开始，就默认关闭了 s
+      
+    
+    </summary>
+    
+    
+      <category term="git" scheme="http://blog.huangang.net/tags/git/"/>
+    
+      <category term="macOS" scheme="http://blog.huangang.net/tags/macOS/"/>
+    
+      <category term="Ventura" scheme="http://blog.huangang.net/tags/Ventura/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>强制删除PostgreSQL数据库</title>
+    <link href="http://blog.huangang.net/2020/01/19/%E5%BC%BA%E5%88%B6%E5%88%A0%E9%99%A4PostgreSQL%E6%95%B0%E6%8D%AE%E5%BA%93/"/>
+    <id>http://blog.huangang.net/2020/01/19/强制删除PostgreSQL数据库/</id>
+    <published>2020-01-19T03:05:21.000Z</published>
+    <updated>2020-07-04T04:19:25.640Z</updated>
+    
+    <content type="html"><![CDATA[<p>1.链接数据库    </p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">psql -h localhost postgres postgres</span><br><span class="line"><span class="comment"># /Library/PostgreSQL/9.4/bin/psql -h localhost postgres postgres</span></span><br></pre></td></tr></table></figure><a id="more"></a><p>2.强制断开连接到该数据库的所有客户端的连接</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">UPDATE pg_database SET datallowconn = <span class="string">'false'</span> WHERE datname = <span class="string">'mydb'</span>;</span><br><span class="line"></span><br><span class="line">SELECT pg_terminate_backend(pid)</span><br><span class="line">FROM pg_stat_activity</span><br><span class="line">WHERE datname = <span class="string">'mydb'</span>;</span><br></pre></td></tr></table></figure><p>3.删除数据库</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DROP DATABASE mydb;</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;1.链接数据库    &lt;/p&gt;
+&lt;figure class=&quot;highlight bash&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;psql -h localhost postgres postgres&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;# /Library/PostgreSQL/9.4/bin/psql -h localhost postgres postgres&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+    
+    </summary>
+    
+    
+      <category term="PostgreSQL" scheme="http://blog.huangang.net/tags/PostgreSQL/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>mac上安卓打包环境的maven全局代理配置</title>
+    <link href="http://blog.huangang.net/2019/07/09/mac%E4%B8%8A%E5%AE%89%E5%8D%93%E6%89%93%E5%8C%85%E7%8E%AF%E5%A2%83%E7%9A%84maven%E5%85%A8%E5%B1%80%E4%BB%A3%E7%90%86%E9%85%8D%E7%BD%AE/"/>
+    <id>http://blog.huangang.net/2019/07/09/mac上安卓打包环境的maven全局代理配置/</id>
+    <published>2019-07-09T02:31:34.000Z</published>
+    <updated>2020-07-04T04:19:25.628Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote><p>国内maven太慢,用全局代理替换成阿里云的源</p></blockquote><a id="more"></a><h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p>路径:<code>~/.gradle/init.gradle</code></p><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">allprojects</span>&#123;</span><br><span class="line">    <span class="keyword">buildscript</span> &#123;</span><br><span class="line">        <span class="keyword">repositories</span> &#123;</span><br><span class="line">            <span class="keyword">def</span> ALIYUN_REPOSITORY_URL = <span class="string">'https://maven.aliyun.com/repository/google'</span></span><br><span class="line">            <span class="keyword">def</span> ALIYUN_JCENTER_URL = <span class="string">'https://maven.aliyun.com/repository/jcenter'</span></span><br><span class="line">            all &#123; ArtifactRepository repo -&gt;</span><br><span class="line">                <span class="keyword">if</span>(repo <span class="keyword">instanceof</span> MavenArtifactRepository)&#123;</span><br><span class="line">                    <span class="keyword">def</span> url = repo.url.toString()</span><br><span class="line">                    <span class="keyword">if</span> (url.startsWith(<span class="string">'https://repo1.maven.org/maven2'</span>)||url.startsWith(<span class="string">'https://dl.google.com/dl/android/maven2'</span>)||url.startsWith(<span class="string">'https://maven.google.com'</span>)) &#123;</span><br><span class="line">                        <span class="keyword">project</span>.logger.lifecycle <span class="string">"Repository $&#123;repo.url&#125; replaced by $ALIYUN_REPOSITORY_URL."</span></span><br><span class="line">                        remove repo</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">if</span> (url.startsWith(<span class="string">'https://jcenter.bintray.com/'</span>)) &#123;</span><br><span class="line">                        <span class="keyword">project</span>.logger.lifecycle <span class="string">"Repository $&#123;repo.url&#125; replaced by $ALIYUN_JCENTER_URL."</span></span><br><span class="line">                        remove repo</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            maven &#123;</span><br><span class="line">            url ALIYUN_REPOSITORY_URL</span><br><span class="line">        &#125;</span><br><span class="line">        maven&#123;</span><br><span class="line">            url ALIYUN_JCENTER_URL</span><br><span class="line">        &#125;</span><br><span class="line">            &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">repositories</span> &#123;</span><br><span class="line">        <span class="keyword">def</span> ALIYUN_REPOSITORY_URL = <span class="string">'https://maven.aliyun.com/repository/google'</span></span><br><span class="line">        <span class="keyword">def</span> ALIYUN_JCENTER_URL = <span class="string">'https://maven.aliyun.com/repository/jcenter'</span></span><br><span class="line">        all &#123; ArtifactRepository repo -&gt;</span><br><span class="line">            <span class="keyword">if</span>(repo <span class="keyword">instanceof</span> MavenArtifactRepository)&#123;</span><br><span class="line">                <span class="keyword">def</span> url = repo.url.toString()</span><br><span class="line">                <span class="keyword">if</span> (url.startsWith(<span class="string">'https://repo1.maven.org/maven2'</span>)||url.startsWith(<span class="string">'https://dl.google.com/dl/android/maven2'</span>)) &#123;</span><br><span class="line">                        <span class="keyword">project</span>.logger.lifecycle <span class="string">"Repository $&#123;repo.url&#125; replaced by $ALIYUN_REPOSITORY_URL."</span></span><br><span class="line">                        remove repo</span><br><span class="line">                    &#125;</span><br><span class="line">                <span class="keyword">if</span> (url.startsWith(<span class="string">'https://jcenter.bintray.com/'</span>)) &#123;</span><br><span class="line">                    <span class="keyword">project</span>.logger.lifecycle <span class="string">"Repository $&#123;repo.url&#125; replaced by $ALIYUN_JCENTER_URL."</span></span><br><span class="line">                    remove repo</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        maven &#123;</span><br><span class="line">            url ALIYUN_REPOSITORY_URL</span><br><span class="line">        &#125;</span><br><span class="line">        maven&#123;</span><br><span class="line">            url ALIYUN_JCENTER_URL</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;国内maven太慢,用全局代理替换成阿里云的源&lt;/p&gt;
+&lt;/blockquote&gt;
+    
+    </summary>
+    
+    
+      <category term="mac" scheme="http://blog.huangang.net/tags/mac/"/>
+    
+      <category term="android" scheme="http://blog.huangang.net/tags/android/"/>
+    
+      <category term="maven" scheme="http://blog.huangang.net/tags/maven/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>解决 PostgreSQL Uniqueness violation. duplicate key value violates unique constraint</title>
+    <link href="http://blog.huangang.net/2019/07/07/%E8%A7%A3%E5%86%B3PostgreSQL-Uniqueness-violation-duplicate-key-value-violates-unique-constraint/"/>
+    <id>http://blog.huangang.net/2019/07/07/解决PostgreSQL-Uniqueness-violation-duplicate-key-value-violates-unique-constraint/</id>
+    <published>2019-07-07T11:51:34.000Z</published>
+    <updated>2020-07-04T04:19:25.640Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h2><p>最近做PostgreSQL的数据结构同步和迁移完之后发生了<br><code>Uniqueness violation. duplicate key value violates unique constraint</code><br>的错误</p><h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>执行下面sql语句      </p><pre><code class="sql"><span class="keyword">SELECT</span> setval(pg_get_serial_sequence(<span class="string">'table_name'</span>, <span class="string">'id'</span>), <span class="keyword">coalesce</span>(<span class="keyword">max</span>(<span class="keyword">id</span>),<span class="number">1</span>), <span class="literal">false</span>) <span class="keyword">FROM</span> table_name;</code></pre>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;起因&quot;&gt;&lt;a href=&quot;#起因&quot; class=&quot;headerlink&quot; title=&quot;起因&quot;&gt;&lt;/a&gt;起因&lt;/h2&gt;&lt;p&gt;最近做PostgreSQL的数据结构同步和迁移完之后发生了&lt;br&gt;&lt;code&gt;Uniqueness violation. duplicate
+      
+    
+    </summary>
+    
+    
+      <category term="PostgreSQL" scheme="http://blog.huangang.net/tags/PostgreSQL/"/>
+    
+      <category term="GraphQL" scheme="http://blog.huangang.net/tags/GraphQL/"/>
+    
+      <category term="hasura" scheme="http://blog.huangang.net/tags/hasura/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>openshift 命令行工具查看日志</title>
+    <link href="http://blog.huangang.net/2019/07/03/openshift-%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%B7%A5%E5%85%B7%E6%9F%A5%E7%9C%8B%E6%97%A5%E5%BF%97/"/>
+    <id>http://blog.huangang.net/2019/07/03/openshift-命令行工具查看日志/</id>
+    <published>2019-07-03T07:53:49.000Z</published>
+    <updated>2020-07-04T04:19:25.629Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote><p>因为有时候访问oc的web页面比较慢,而且日志只能看5000条</p></blockquote><a id="more"></a><h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">brew install openshift-cli</span><br></pre></td></tr></table></figure><h2 id="登陆"><a href="#登陆" class="headerlink" title="登陆"></a>登陆</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">oc login https://oc-service:port</span><br></pre></td></tr></table></figure><p>输入用户名和密码<br>退出用这个<code>oc logout</code></p><h2 id="查看项目"><a href="#查看项目" class="headerlink" title="查看项目"></a>查看项目</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">oc get pods</span><br></pre></td></tr></table></figure><p>返回    </p><details><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">NAME                        READY     STATUS      RESTARTS   AGE</span><br><span class="line">testservice-6-fh58x          1/1       Running     1          94d</span><br><span class="line">testservice-6-ql5km          1/1       Running     0          94d</span><br></pre></td></tr></table></figure></details><h2 id="查看日志"><a href="#查看日志" class="headerlink" title="查看日志"></a>查看日志</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">oc logs <span class="variable">$POD_NAME</span> -f <span class="comment"># -f 是为了保持一直查看,如果没有就是一次性把最新的日志返回然后结束了</span></span><br></pre></td></tr></table></figure><p>如<code>oc logs testservice-6-fh58x -f</code></p><blockquote><p>注:一般看状态是<code>Running</code>的pod,状态是<code>Completed</code>一般表示构建容器的日志</p></blockquote><h2 id="多容器查看"><a href="#多容器查看" class="headerlink" title="多容器查看"></a>多容器查看</h2><p>安装 stern <code>brew install stern</code><br>查看日志 <code>stern testservice-</code>   </p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;因为有时候访问oc的web页面比较慢,而且日志只能看5000条&lt;/p&gt;
+&lt;/blockquote&gt;
+    
+    </summary>
+    
+    
+      <category term="mac" scheme="http://blog.huangang.net/tags/mac/"/>
+    
+      <category term="openshift" scheme="http://blog.huangang.net/tags/openshift/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>解决Xcode10报错library not found for -libstdc++.6.0.9</title>
+    <link href="http://blog.huangang.net/2019/02/16/%E8%A7%A3%E5%86%B3Xcode10%E6%8A%A5%E9%94%99library-not-found-for-libstdc-6-0-9/"/>
+    <id>http://blog.huangang.net/2019/02/16/解决Xcode10报错library-not-found-for-libstdc-6-0-9/</id>
+    <published>2019-02-16T02:24:54.000Z</published>
+    <updated>2020-07-04T04:19:25.640Z</updated>
+    
+    <content type="html"><![CDATA[<p>苹果在XCode10和iOS12中移除了libstdc++这个库，由libc++这个库取而代之，<br>苹果的解释是libstdc++已经标记为废弃有5年了，建议大家使用经过了llvm优化过并且全面支持C++11的libc++库。<br>临时解决方法:将xcode9中 libstdc++ 库导入到xcode10中两个位置，一套是模拟器的，一套是设备的</p><figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.<span class="number">1</span>.sdk/usr/<span class="class"><span class="keyword">lib</span>/</span></span><br><span class="line">/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk/usr/<span class="class"><span class="keyword">lib</span>/</span></span><br></pre></td></tr></table></figure><p><a href="https://github.com/MeteoriteMan/Assets/blob/master/Assets/libstdc%2B%2B.6.0.9.tbd" target="_blank" rel="noopener">libstdc++.6.0.9下载地址</a><br>注意:下载的libstdc++.6.0.9最下面的<code>...</code>三个点需要去掉</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;苹果在XCode10和iOS12中移除了libstdc++这个库，由libc++这个库取而代之，&lt;br&gt;苹果的解释是libstdc++已经标记为废弃有5年了，建议大家使用经过了llvm优化过并且全面支持C++11的libc++库。&lt;br&gt;临时解决方法:将xcode9中 li
+      
+    
+    </summary>
+    
+    
+      <category term="mac" scheme="http://blog.huangang.net/tags/mac/"/>
+    
+      <category term="xcode" scheme="http://blog.huangang.net/tags/xcode/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>修复在macos brew link python 的错误</title>
+    <link href="http://blog.huangang.net/2018/05/14/%E4%BF%AE%E5%A4%8D%E5%9C%A8macos-brew-link-python-%E7%9A%84%E9%94%99%E8%AF%AF/"/>
+    <id>http://blog.huangang.net/2018/05/14/修复在macos-brew-link-python-的错误/</id>
+    <published>2018-05-14T05:56:59.000Z</published>
+    <updated>2020-07-04T04:19:25.639Z</updated>
+    
+    <content type="html"><![CDATA[<p>最近用brew link python的时候出现这个问题<code>Linking /usr/local/Cellar/python/2.7.14_3... Error: Permission denied @ dir_s_mkdir - /usr/local/Frameworks</code><br>解决办法<br> <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo mkdir /usr/<span class="built_in">local</span>/Frameworks   </span><br><span class="line">sudo chown -R $(whoami) /usr/<span class="built_in">local</span>/Frameworks   </span><br><span class="line">brew link python</span><br></pre></td></tr></table></figure></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;最近用brew link python的时候出现这个问题&lt;code&gt;Linking /usr/local/Cellar/python/2.7.14_3... Error: Permission denied @ dir_s_mkdir - /usr/local/Framew
+      
+    
+    </summary>
+    
+    
+      <category term="mac" scheme="http://blog.huangang.net/tags/mac/"/>
+    
+      <category term="brew" scheme="http://blog.huangang.net/tags/brew/"/>
+    
+      <category term="python" scheme="http://blog.huangang.net/tags/python/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Mac 安全与隐私,允许任何来源选项</title>
+    <link href="http://blog.huangang.net/2018/04/30/Mac-%E5%AE%89%E5%85%A8%E4%B8%8E%E9%9A%90%E7%A7%81-%E5%85%81%E8%AE%B8%E4%BB%BB%E4%BD%95%E6%9D%A5%E6%BA%90%E9%80%89%E9%A1%B9/"/>
+    <id>http://blog.huangang.net/2018/04/30/Mac-安全与隐私-允许任何来源选项/</id>
+    <published>2018-04-30T12:32:05.000Z</published>
+    <updated>2020-07-04T04:19:25.625Z</updated>
+    
+    <content type="html"><![CDATA[<p>打开终端输入命令<br><code>sudo spctl --master-disable</code></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;打开终端输入命令&lt;br&gt;&lt;code&gt;sudo spctl --master-disable&lt;/code&gt;&lt;/p&gt;
+
+      
+    
+    </summary>
+    
+    
+      <category term="mac" scheme="http://blog.huangang.net/tags/mac/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>解决MacOS更改打开文件限制</title>
+    <link href="http://blog.huangang.net/2017/12/18/macos-upgrade-changes-open-file-limit/"/>
+    <id>http://blog.huangang.net/2017/12/18/macos-upgrade-changes-open-file-limit/</id>
+    <published>2017-12-18T08:54:17.000Z</published>
+    <updated>2020-07-04T04:19:25.628Z</updated>
+    
+    <content type="html"><![CDATA[<p>最近用node进行文件读写操作的时候碰到<br><code>Unhandled rejection Error: ENFILE: file table overflow, open ...</code><br>的问题。</p><a id="more"></a><p>最后Google查得解决问题的方法，<a href="https://superuser.com/questions/827984/open-files-limit-does-not-work-as-before-in-osx-yosemite/828010#828010" target="_blank" rel="noopener">这个用户的帖子（和答案）</a>。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">echo</span> kern.maxfiles=65536 | sudo tee -a /etc/sysctl.conf</span><br><span class="line">$ <span class="built_in">echo</span> kern.maxfilesperproc=65536 | sudo tee -a /etc/sysctl.conf</span><br><span class="line">$ sudo sysctl -w kern.maxfiles=65536</span><br><span class="line">$ sudo sysctl -w kern.maxfilesperproc=65536</span><br><span class="line">$ <span class="built_in">ulimit</span> -n 65536 65536</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;最近用node进行文件读写操作的时候碰到&lt;br&gt;&lt;code&gt;Unhandled rejection Error: ENFILE: file table overflow, open ...&lt;/code&gt;&lt;br&gt;的问题。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="mac" scheme="http://blog.huangang.net/tags/mac/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>centos 7 安装jxcore编译环境</title>
+    <link href="http://blog.huangang.net/2017/10/30/centos-7-%E5%AE%89%E8%A3%85jxcore%E7%BC%96%E8%AF%91%E7%8E%AF%E5%A2%83/"/>
+    <id>http://blog.huangang.net/2017/10/30/centos-7-安装jxcore编译环境/</id>
+    <published>2017-10-30T05:19:13.000Z</published>
+    <updated>2020-07-04T04:19:25.626Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h1><p>到这个地址<a href="https://github.com/thaliproject/jxbuild/blob/master/distribute.md" target="_blank" rel="noopener">https://github.com/thaliproject/jxbuild/blob/master/distribute.md</a><br>下载最新linux环境的(jx_linux64v8.zip)，然后解压出<code>jx</code>，执行<code>mv jx /usr/bin/</code></p><a id="more"></a><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>执行<code>jx -v</code>可能会看到</p><figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">jx: <span class="string">/lib64/libstdc</span>++<span class="string">.so.6</span>: <span class="keyword">version</span> `GLIBCXX_3.4.20' not found <span class="params">(required by jx)</span>   </span><br><span class="line">jx: <span class="string">/lib64/libstdc</span>++<span class="string">.so.6</span>: <span class="keyword">version</span> `GLIBCXX_3.4.21' not found <span class="params">(required by jx)</span></span><br></pre></td></tr></table></figure><p>这个是很好需要安装高版本的gcc </p><h1 id="安装gcc5解决问题"><a href="#安装gcc5解决问题" class="headerlink" title="安装gcc5解决问题"></a>安装gcc5解决问题</h1><p><code>vi /etc/yum.repos.d/Fedora-Core23.repo</code><br>写入    </p><figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[warning:fedora]</span></span><br><span class="line"><span class="attr">name</span>=fedora</span><br><span class="line"><span class="attr">mirrorlist</span>=http://mirrors.fedoraproject.org/mirrorlist?repo=fedora-<span class="number">23</span>&amp;arch=<span class="variable">$basearch</span></span><br><span class="line"><span class="attr">enabled</span>=<span class="number">1</span></span><br><span class="line"><span class="attr">gpgcheck</span>=<span class="number">0</span></span><br></pre></td></tr></table></figure><p>这个时候执行<code>yum install gcc --enablerepo=warning:fedora</code>就行<br>安装好后执行<code>jx -v</code>可看到<code>v0.10.40</code>代表安装成功了</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;下载&quot;&gt;&lt;a href=&quot;#下载&quot; class=&quot;headerlink&quot; title=&quot;下载&quot;&gt;&lt;/a&gt;下载&lt;/h1&gt;&lt;p&gt;到这个地址&lt;a href=&quot;https://github.com/thaliproject/jxbuild/blob/master/distribute.md&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;https://github.com/thaliproject/jxbuild/blob/master/distribute.md&lt;/a&gt;&lt;br&gt;下载最新linux环境的(jx_linux64v8.zip)，然后解压出&lt;code&gt;jx&lt;/code&gt;，执行&lt;code&gt;mv jx /usr/bin/&lt;/code&gt;&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="centos7" scheme="http://blog.huangang.net/tags/centos7/"/>
+    
+      <category term="jxcore" scheme="http://blog.huangang.net/tags/jxcore/"/>
+    
+      <category term="jx" scheme="http://blog.huangang.net/tags/jx/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>loopback 开启静态资源访问</title>
+    <link href="http://blog.huangang.net/2017/06/28/loopback-%E5%BC%80%E5%90%AF%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E8%AE%BF%E9%97%AE/"/>
+    <id>http://blog.huangang.net/2017/06/28/loopback-开启静态资源访问/</id>
+    <published>2017-06-28T02:56:30.000Z</published>
+    <updated>2020-07-04T04:19:25.628Z</updated>
+    
+    <content type="html"><![CDATA[<p>在<code>server/middleware.json</code>的 <code>files</code>改成</p><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">"files": &#123;</span><br><span class="line">   "loopback#static": &#123;</span><br><span class="line">     "params": "$!../client"</span><br><span class="line">   &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;在&lt;code&gt;server/middleware.json&lt;/code&gt;的 &lt;code&gt;files&lt;/code&gt;改成&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;
+      
+    
+    </summary>
+    
+    
+      <category term="loopback" scheme="http://blog.huangang.net/tags/loopback/"/>
+    
+      <category term="nodejs" scheme="http://blog.huangang.net/tags/nodejs/"/>
+    
+      <category term="node" scheme="http://blog.huangang.net/tags/node/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>centos7 安装 docker-composer</title>
+    <link href="http://blog.huangang.net/2017/05/13/centos7-%E5%AE%89%E8%A3%85-docker-composer/"/>
+    <id>http://blog.huangang.net/2017/05/13/centos7-安装-docker-composer/</id>
+    <published>2017-05-13T09:07:19.000Z</published>
+    <updated>2020-07-04T04:19:25.626Z</updated>
+    
+    <content type="html"><![CDATA[<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">yum update</span><br><span class="line">yum install docker</span><br><span class="line">service docker start <span class="comment">#启动 Docker 服务</span></span><br><span class="line"><span class="comment">#或者使用`docker -d` 来启动</span></span><br><span class="line">chkconfig docker on <span class="comment">#随系统启动自动加载</span></span><br><span class="line">curl -L https://github.com/docker/compose/releases/download/1.13.0/docker-compose-`uname -s`-`uname -m` &gt; /usr/<span class="built_in">local</span>/bin/docker-compose</span><br><span class="line">chmod +x /usr/<span class="built_in">local</span>/bin/docker-compose</span><br></pre></td></tr></table></figure><p>接下来就可以愉快的使用<code>docker-compose</code>命令了</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;figure class=&quot;highlight bash&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=
+      
+    
+    </summary>
+    
+    
+      <category term="docker" scheme="http://blog.huangang.net/tags/docker/"/>
+    
+      <category term="centos7" scheme="http://blog.huangang.net/tags/centos7/"/>
+    
+      <category term="centos" scheme="http://blog.huangang.net/tags/centos/"/>
+    
+      <category term="docker-composer" scheme="http://blog.huangang.net/tags/docker-composer/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>docker容器启动后添加端口映射</title>
+    <link href="http://blog.huangang.net/2017/01/06/docker%E5%AE%B9%E5%99%A8%E5%90%AF%E5%8A%A8%E5%90%8E%E6%B7%BB%E5%8A%A0%E7%AB%AF%E5%8F%A3%E6%98%A0%E5%B0%84/"/>
+    <id>http://blog.huangang.net/2017/01/06/docker容器启动后添加端口映射/</id>
+    <published>2017-01-06T06:00:00.000Z</published>
+    <updated>2020-07-04T04:19:25.626Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h2><p>网上有许多人在查找关于容器启动后能否进行端口映射的问题。我曾经也问过度娘，很遗憾我没找到。本文就这个问题给出一个解决方法，旨在抛砖引玉。本文的思路是使用iptables的端口转发，这也是docker端口映射内部的实现机制，只不过我是显示地写出来罢了，为的就是让查找这个问题的人对docker的端口映射有一个直观的了解。</p><a id="more"></a> <p><strong>结论：容器启动后是可以添加端口映射的，但不建议手工添加，最好使用docker提供的功能。</strong></p><h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><p>创建两个容器并进行了端口映射，结果如图所示：</p><p><img src="http://huangang.pupued.com/131229_OhXt_266752.png" alt></p><p>假如，我start一个容器，其内部IP为172.17.0.5，并在容器内部启动了80端口。</p><p>FORWARD规则链我们不用管它，docker已经帮我们写好了，我们只需要关心NAT中的几条链即可。</p><p>查看NAT表中的PREROUTING链</p><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iptables -t<span class="built_in"> nat </span>--list-rules POSTROUTING</span><br></pre></td></tr></table></figure><p><img src="http://huangang.pupued.com/131753_i0yc_266752.png" alt></p><p>从上面可以看出，iptables将满足条件的数据都转发到了DOCKER链上去了。</p><p>查看NAT表中的DOCKER链</p><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iptables -t<span class="built_in"> nat </span>--list-rules DOCKER</span><br></pre></td></tr></table></figure><p><img src="http://huangang.pupued.com/132524_5fkC_266752.png" alt></p><p>仿照上图，我们添加一条自己的映射规则，将宿主的8082端口映射到172.17.0.5的80端口上去，规则如下：</p><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iptables -t<span class="built_in"> nat </span>-A DOCKER ! -i docker0 -p tcp -m tcp --dport 8082 -j DNAT --to-destination 172.17.0.5:80</span><br></pre></td></tr></table></figure><p>查看NAT表中的POSTROUTING链<br><img src="http://huangang.pupued.com/132027_kvzk_266752.png" alt></p><p>仿照上图中的规则，书写的规则如下：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iptables -t nat -A POSTROUTING -s 172.17.0.5/32 -d 172.17.0.5/32 -p tcp -m tcp --dport 80 -j  MASQUERADE</span><br></pre></td></tr></table></figure><p>查看FILTER表中的DOCKER链</p><figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iptables <span class="comment">--list-rules DOCKER</span></span><br></pre></td></tr></table></figure><p><img src="http://huangang.pupued.com/133616_vQYj_266752.png" alt></p><p>仿照上图书写规则如下：</p><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iptables -t<span class="built_in"> filter </span>-A DOCKER -d 172.17.0.5/32 ! -i docker0 -o docker0 -p tcp -m tcp --dport 80 -j ACCEPT</span><br></pre></td></tr></table></figure><h2 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h2><p>虽然IP为172.17.0.5的容器没有开启端口映射，如下图所示：<br><img src="http://huangang.pupued.com/134008_c2g8_266752.png" alt></p><p>但我们依然能够通过访问宿主机(192.168.78.238)的8082端口来访问172.17.0.5的80端口，效果如下：</p><p><img src="http://huangang.pupued.com/134500_g6vj_266752.png" alt></p><p>使用此方法有一个缺点，不能访问localhost:8082，也就是说如果想对localhost也进行转发，需要进行额外的配置。</p><h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>建议大家不要像我这样去做端口映射，我这么做只是为了阐述标题。</p><p>如果大家在容器中添加了一些东西，并开启了端口，同时呢，又想多复制几个这样的容器。建议大家把容器提交成镜像，然后使用docker提供的端口映射功能。</p><h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>如果上面命令不小心添加错了,把<code>-A</code>改成<code>-D</code>,如下面</p><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">iptables -t<span class="built_in"> nat </span>-D DOCKER ! -i docker0 -p tcp -m tcp --dport 8082 -j DNAT --to-destination 172.17.0.5:80</span><br><span class="line">iptables -t<span class="built_in"> nat </span>-D POSTROUTING -s 172.17.0.5/32 -d 172.17.0.5/32 -p tcp -m tcp --dport 80 -j  MASQUERADE</span><br><span class="line">iptables -t<span class="built_in"> filter </span>-D DOCKER -d 172.17.0.5/32 ! -i docker0 -o docker0 -p tcp -m tcp --dport 80 -j ACCEPT</span><br></pre></td></tr></table></figure><p>这样就能把你写错或者不需要的规则删除</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;概要&quot;&gt;&lt;a href=&quot;#概要&quot; class=&quot;headerlink&quot; title=&quot;概要&quot;&gt;&lt;/a&gt;概要&lt;/h2&gt;&lt;p&gt;网上有许多人在查找关于容器启动后能否进行端口映射的问题。我曾经也问过度娘，很遗憾我没找到。本文就这个问题给出一个解决方法，旨在抛砖引玉。本文的思路是使用iptables的端口转发，这也是docker端口映射内部的实现机制，只不过我是显示地写出来罢了，为的就是让查找这个问题的人对docker的端口映射有一个直观的了解。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="docker" scheme="http://blog.huangang.net/tags/docker/"/>
+    
+      <category term="iptables" scheme="http://blog.huangang.net/tags/iptables/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>js中let和var定义变量的区别</title>
+    <link href="http://blog.huangang.net/2016/10/30/js%E4%B8%ADlet%E5%92%8Cvar%E5%AE%9A%E4%B9%89%E5%8F%98%E9%87%8F%E7%9A%84%E5%8C%BA%E5%88%AB/"/>
+    <id>http://blog.huangang.net/2016/10/30/js中let和var定义变量的区别/</id>
+    <published>2016-10-30T04:57:26.000Z</published>
+    <updated>2020-07-04T04:19:25.627Z</updated>
+    
+    <content type="html"><![CDATA[<p>注:如果要使用<code>let</code>声明变量,必须在文件头添加<code>&#39;use strict&#39;</code>严格模式的声明,不然会报错.</p><a id="more"></a><h2 id="1-声明后未赋值，表现相同"><a href="#1-声明后未赋值，表现相同" class="headerlink" title="1.声明后未赋值，表现相同"></a>1.声明后未赋值，表现相同</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">'use strict'</span>;</span><br><span class="line"></span><br><span class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> varTest;</span><br><span class="line">  <span class="keyword">let</span> letTest;</span><br><span class="line">  <span class="built_in">console</span>.log(varTest); <span class="comment">//输出undefined</span></span><br><span class="line">  <span class="built_in">console</span>.log(letTest); <span class="comment">//输出undefined</span></span><br><span class="line">&#125;());</span><br></pre></td></tr></table></figure><h2 id="2-使用未声明的变量，表现不同"><a href="#2-使用未声明的变量，表现不同" class="headerlink" title="2.使用未声明的变量，表现不同:"></a>2.使用未声明的变量，表现不同:</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">'use strict'</span>;</span><br><span class="line"></span><br><span class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(varTest); <span class="comment">//输出undefined(注意要注释掉下面一行才能运行)</span></span><br><span class="line">  <span class="built_in">console</span>.log(letTest); <span class="comment">//直接报错: Uncaught ReferenceError: letTest is not defined</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> varTest = <span class="string">'test var OK.'</span>;</span><br><span class="line">  <span class="keyword">let</span> letTest = <span class="string">'test let OK.'</span>;</span><br><span class="line">&#125;());</span><br></pre></td></tr></table></figure><h3 id="3-重复声明同一个变量时，表现不同："><a href="#3-重复声明同一个变量时，表现不同：" class="headerlink" title="3.重复声明同一个变量时，表现不同："></a>3.重复声明同一个变量时，表现不同：</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">'use strict'</span>;</span><br><span class="line"></span><br><span class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> varTest = <span class="string">'test var OK.'</span>;</span><br><span class="line">  <span class="keyword">var</span> varTest = <span class="string">'varTest changed.'</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(varTest); <span class="comment">//输出varTest changed.</span></span><br><span class="line">&#125;());</span><br><span class="line"></span><br><span class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> letTest = <span class="string">'test let OK.'</span>;</span><br><span class="line">  <span class="keyword">let</span> letTest = <span class="string">'letTest changed.'</span>;</span><br><span class="line">  <span class="built_in">console</span>.log(letTest); <span class="comment">///直接报错: Uncaught SyntaxError: Identifier 'letTest' has already been declared</span></span><br><span class="line">&#125;());</span><br></pre></td></tr></table></figure><h2 id="4-变量作用范围，表现不同"><a href="#4-变量作用范围，表现不同" class="headerlink" title="4.变量作用范围，表现不同"></a>4.变量作用范围，表现不同</h2><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">'use strict'</span>;</span><br><span class="line"></span><br><span class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> varTest = <span class="string">'test var OK.'</span>;</span><br><span class="line">  <span class="keyword">let</span> letTest = <span class="string">'test let OK.'</span>;</span><br><span class="line"></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="keyword">var</span> varTest = <span class="string">'varTest changed.'</span>;</span><br><span class="line">    <span class="keyword">let</span> letTest = <span class="string">'letTest changed.'</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">console</span>.log(varTest); <span class="comment">//输出"varTest changed."，内部"&#123;&#125;"中声明的varTest变量覆盖外部的letTest声明</span></span><br><span class="line">  <span class="built_in">console</span>.log(letTest); <span class="comment">//输出"test let OK."，内部"&#123;&#125;"中声明的letTest和外部的letTest不是同一个变量</span></span><br><span class="line">&#125;());</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;注:如果要使用&lt;code&gt;let&lt;/code&gt;声明变量,必须在文件头添加&lt;code&gt;&amp;#39;use strict&amp;#39;&lt;/code&gt;严格模式的声明,不然会报错.&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="javascript" scheme="http://blog.huangang.net/tags/javascript/"/>
+    
+      <category term="严格模式" scheme="http://blog.huangang.net/tags/%E4%B8%A5%E6%A0%BC%E6%A8%A1%E5%BC%8F/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>nginx 负载均衡配置</title>
+    <link href="http://blog.huangang.net/2016/10/17/nginx-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E9%85%8D%E7%BD%AE/"/>
+    <id>http://blog.huangang.net/2016/10/17/nginx-负载均衡配置/</id>
+    <published>2016-10-17T02:19:03.000Z</published>
+    <updated>2020-07-04T04:19:25.629Z</updated>
+    
+    <content type="html"><![CDATA[<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">upstream api.com &#123;</span><br><span class="line">    ip_hash;</span><br><span class="line">   <span class="built_in"> server </span>127.0.0.1:81 <span class="attribute">weight</span>=2 <span class="attribute">max_fails</span>=3 <span class="attribute">fail_timeout</span>=15;</span><br><span class="line">   <span class="built_in"> server </span>127.0.0.1:82 <span class="attribute">weight</span>=3;</span><br><span class="line">   <span class="built_in"> server </span>127.0.0.1:83 backup;</span><br><span class="line">   <span class="built_in"> server </span>127.0.0.1:84 down;</span><br><span class="line">   <span class="built_in"> server </span>127.0.0.1:85 <span class="attribute">max_conns</span>=1000;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><a id="more"></a>   <h2 id="1-轮循（默认）"><a href="#1-轮循（默认）" class="headerlink" title="1.轮循（默认）"></a>1.轮循（默认）</h2><p>轮询即Round Robin，根据Nginx配置文件中的顺序，<br>依次把客户端的Web请求分发到不同的后端服务器上</p><h2 id="2、最少连接-least-conn"><a href="#2、最少连接-least-conn" class="headerlink" title="2、最少连接 least_conn;"></a>2、最少连接 least_conn;</h2><p>Web请求会被转发到连接数最少的服务器上。</p><h2 id="3、IP地址哈希-ip-hash"><a href="#3、IP地址哈希-ip-hash" class="headerlink" title="3、IP地址哈希 ip_hash;"></a>3、IP地址哈希 ip_hash;</h2><p>前述的两种负载均衡方案中，同一客户端连续的Web请求可能会被分发到不同的后端服务器进行处理，<br>因此如果涉及到会话Session，那么会话会比较复杂。常见的是基于数据库的会话持久化。<br>要克服上面的难题，可以使用基于IP地址哈希的负载均衡方案。<br>这样的话，同一客户端连续的Web请求都会被分发到同一服务器进行处理。</p><h2 id="4、基于权重-weight"><a href="#4、基于权重-weight" class="headerlink" title="4、基于权重 weight"></a>4、基于权重 weight</h2><p>基于权重的负载均衡即Weighted Load Balancing，<br>这种方式下，我们可以配置Nginx把请求更多地分发到高配置的后端服务器上，<br>把相对较少的请求分发到低配服务器。</p><p><code>weight</code><br>默认为1，将请求平均分配给每台server<br><code>backup</code><br>备份机，所有服务器挂了之后才会生效<br><code>down</code><br>标识某一台server不可用。可能能通过某些参数动态的激活它吧，要不真没啥用。<br><code>fail_timeout</code><br>默认为10秒。某台Server达到max_fails次失败请求后，在fail_timeout期间内，nginx会认为这台Server暂时不可用，不会将请求分配给它<br><code>max_fails</code><br>默认为1。某台Server允许请求失败的次数，超过最大次数后，在fail_timeout时间内，新的请求将不会分配给这台机器。如果设置为0，Nginx会将这台Server置为永久无效状态，然后将请求发给定义了proxy_next_upstream, fastcgi_next_upstream, uwsgi_next_upstream, scgi_next_upstream, and memcached_next_upstream指令来处理这次错误的请求。<br><code>max_conns</code><br>限制分配给某台Server处理的最大连接数量，超过这个数量，将不会分配新的连接给它。默认为0，表示不限制。注意：1.5.9之后的版本才有这个配置</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;figure class=&quot;highlight routeros&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;6&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;7&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;8&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;upstream api.com &amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    ip_hash;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;   &lt;span class=&quot;built_in&quot;&gt; server &lt;/span&gt;127.0.0.1:81 &lt;span class=&quot;attribute&quot;&gt;weight&lt;/span&gt;=2 &lt;span class=&quot;attribute&quot;&gt;max_fails&lt;/span&gt;=3 &lt;span class=&quot;attribute&quot;&gt;fail_timeout&lt;/span&gt;=15;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;   &lt;span class=&quot;built_in&quot;&gt; server &lt;/span&gt;127.0.0.1:82 &lt;span class=&quot;attribute&quot;&gt;weight&lt;/span&gt;=3;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;   &lt;span class=&quot;built_in&quot;&gt; server &lt;/span&gt;127.0.0.1:83 backup;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;   &lt;span class=&quot;built_in&quot;&gt; server &lt;/span&gt;127.0.0.1:84 down;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;   &lt;span class=&quot;built_in&quot;&gt; server &lt;/span&gt;127.0.0.1:85 &lt;span class=&quot;attribute&quot;&gt;max_conns&lt;/span&gt;=1000;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&amp;#125;&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+    
+    </summary>
+    
+    
+      <category term="nginx" scheme="http://blog.huangang.net/tags/nginx/"/>
+    
+      <category term="负载均衡" scheme="http://blog.huangang.net/tags/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>解决mac在QQ视频时候，网页上的视频声音突然变小</title>
+    <link href="http://blog.huangang.net/2016/10/06/%E8%A7%A3%E5%86%B3mac%E5%9C%A8QQ%E8%A7%86%E9%A2%91%E6%97%B6%E5%80%99%EF%BC%8C%E7%BD%91%E9%A1%B5%E4%B8%8A%E7%9A%84%E8%A7%86%E9%A2%91%E5%A3%B0%E9%9F%B3%E7%AA%81%E7%84%B6%E5%8F%98%E5%B0%8F/"/>
+    <id>http://blog.huangang.net/2016/10/06/解决mac在QQ视频时候，网页上的视频声音突然变小/</id>
+    <published>2016-10-06T02:57:07.000Z</published>
+    <updated>2020-07-04T04:19:25.640Z</updated>
+    
+    <content type="html"><![CDATA[<ol><li>打开QQ，先不要视频。   </li><li>打开Mac自带的终端(Terminal)，输入以下代码然后回车，可能需要输入系统密码<br><code>printf &quot;p *(char*)(void(*)())AudioDeviceDuck=0xc3\nq&quot; | lldb -n QQ</code>    </li><li>然后就可以视频或语音了，拨出和接收视屏声音都不会变小。<br>代码最后的QQ是程序的名字，如果你想用在其他程序上，改成其他程序的名字即可。    </li></ol>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;ol&gt;
+&lt;li&gt;打开QQ，先不要视频。   &lt;/li&gt;
+&lt;li&gt;打开Mac自带的终端(Terminal)，输入以下代码然后回车，可能需要输入系统密码&lt;br&gt;&lt;code&gt;printf &amp;quot;p *(char*)(void(*)())AudioDeviceDuck=0xc3\
+      
+    
+    </summary>
+    
+    
+      <category term="mac" scheme="http://blog.huangang.net/tags/mac/"/>
+    
+      <category term="qq" scheme="http://blog.huangang.net/tags/qq/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>解决用 pecl 安装 php 扩展的时候 /usr/local/Library/ENV/4.3/sed 报错</title>
+    <link href="http://blog.huangang.net/2016/09/18/%E8%A7%A3%E5%86%B3-usr-local-Library-ENV-4-3-sed%E6%8A%A5%E9%94%99/"/>
+    <id>http://blog.huangang.net/2016/09/18/解决-usr-local-Library-ENV-4-3-sed报错/</id>
+    <published>2016-09-17T23:38:52.000Z</published>
+    <updated>2020-07-04T04:19:25.640Z</updated>
+    
+    <content type="html"><![CDATA[<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi `which phpize`</span><br></pre></td></tr></table></figure><p>找到 <code>SED=&quot;/usr/local/Library/ENV/4.3/sed&quot;</code> 改成 <code>SED=&quot;/usr/bin/sed&quot;</code></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;figure class=&quot;highlight autohotkey&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;spa
+      
+    
+    </summary>
+    
+    
+      <category term="php" scheme="http://blog.huangang.net/tags/php/"/>
+    
+      <category term="pecl" scheme="http://blog.huangang.net/tags/pecl/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>在 mac 上安装 PEAR 和 PECL</title>
+    <link href="http://blog.huangang.net/2016/09/18/%E5%9C%A8-mac-%E4%B8%8A%E5%AE%89%E8%A3%85-PEAR-%E5%92%8C-PECL/"/>
+    <id>http://blog.huangang.net/2016/09/18/在-mac-上安装-PEAR-和-PECL/</id>
+    <published>2016-09-17T23:29:43.000Z</published>
+    <updated>2020-07-04T04:19:25.639Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="下载-PEAR"><a href="#下载-PEAR" class="headerlink" title="下载 PEAR"></a>下载 PEAR</h2><figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$ </span>brew install autoconf</span><br><span class="line"></span><br><span class="line"><span class="variable">$ </span>curl -O <span class="symbol">http:</span>/<span class="regexp">/pear.php.net/go</span>-pear.phar</span><br><span class="line"><span class="variable">$ </span>[sudo] php -d detect_unicode=0 go-pear.phar</span><br></pre></td></tr></table></figure><a id="more"></a><h2 id="配置和安装-PEAR"><a href="#配置和安装-PEAR" class="headerlink" title="配置和安装 PEAR"></a>配置和安装 PEAR</h2><ol><li>选择 1 然后按回车键。      </li><li>输入:<br><code>/usr/local/pear</code>   </li><li>选择 4 然后按回车键。    </li><li>输入<br><code>/usr/local/bin</code>   </li><li>接下来一直按回车键。</li></ol>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;下载-PEAR&quot;&gt;&lt;a href=&quot;#下载-PEAR&quot; class=&quot;headerlink&quot; title=&quot;下载 PEAR&quot;&gt;&lt;/a&gt;下载 PEAR&lt;/h2&gt;&lt;figure class=&quot;highlight elixir&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;variable&quot;&gt;$ &lt;/span&gt;brew install autoconf&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;variable&quot;&gt;$ &lt;/span&gt;curl -O &lt;span class=&quot;symbol&quot;&gt;http:&lt;/span&gt;/&lt;span class=&quot;regexp&quot;&gt;/pear.php.net/go&lt;/span&gt;-pear.phar&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;variable&quot;&gt;$ &lt;/span&gt;[sudo] php -d detect_unicode=0 go-pear.phar&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+    
+    </summary>
+    
+    
+      <category term="mac" scheme="http://blog.huangang.net/tags/mac/"/>
+    
+      <category term="php" scheme="http://blog.huangang.net/tags/php/"/>
+    
+      <category term="pecl" scheme="http://blog.huangang.net/tags/pecl/"/>
+    
+      <category term="pear" scheme="http://blog.huangang.net/tags/pear/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>mac安装docker-toolbox</title>
+    <link href="http://blog.huangang.net/2016/08/03/mac%E5%AE%89%E8%A3%85docker-toolbox/"/>
+    <id>http://blog.huangang.net/2016/08/03/mac安装docker-toolbox/</id>
+    <published>2016-08-03T01:41:22.000Z</published>
+    <updated>2020-07-04T04:19:25.629Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="安装docker-toolbox"><a href="#安装docker-toolbox" class="headerlink" title="安装docker-toolbox"></a>安装docker-toolbox</h2><figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">brew </span>cask <span class="keyword">install </span>virtualbox</span><br><span class="line"><span class="keyword">brew </span>cask <span class="keyword">install </span>docker-toolbox</span><br></pre></td></tr></table></figure><p>如果你本地没有<code>default</code>虚拟机则执行<br><code>docker-machine create --driver virtualbox default</code></p><a id="more"></a><h2 id="加速docker"><a href="#加速docker" class="headerlink" title="加速docker"></a>加速docker</h2><p>请确认你的 Docker Toolbox 已经启动，并执行下列命令（请将 加速地址 替换为在<a href="https://www.daocloud.io/mirror#accelerator-doc" target="_blank" rel="noopener">加速器</a>页面获取的专属地址）</p><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">docker-machine ssh<span class="built_in"> default </span>  </span><br><span class="line">sudo sed -i <span class="string">"s|EXTRA_ARGS='|EXTRA_ARGS='--registry-mirror=加速地址 |g"</span> /var/lib/boot2docker/profile</span><br><span class="line">exit   </span><br><span class="line">docker-machine restart<span class="built_in"> default </span>  </span><br><span class="line">docker-machine env</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;安装docker-toolbox&quot;&gt;&lt;a href=&quot;#安装docker-toolbox&quot; class=&quot;headerlink&quot; title=&quot;安装docker-toolbox&quot;&gt;&lt;/a&gt;安装docker-toolbox&lt;/h2&gt;&lt;figure class=&quot;highlight mipsasm&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;brew &lt;/span&gt;cask &lt;span class=&quot;keyword&quot;&gt;install &lt;/span&gt;virtualbox&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;brew &lt;/span&gt;cask &lt;span class=&quot;keyword&quot;&gt;install &lt;/span&gt;docker-toolbox&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+
+&lt;p&gt;如果你本地没有&lt;code&gt;default&lt;/code&gt;虚拟机则执行&lt;br&gt;&lt;code&gt;docker-machine create --driver virtualbox default&lt;/code&gt;&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="mac" scheme="http://blog.huangang.net/tags/mac/"/>
+    
+      <category term="docker" scheme="http://blog.huangang.net/tags/docker/"/>
+    
+      <category term="docker-toolbox" scheme="http://blog.huangang.net/tags/docker-toolbox/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>php全栈学习路线</title>
+    <link href="http://blog.huangang.net/2016/07/09/php%E5%85%A8%E6%A0%88%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF/"/>
+    <id>http://blog.huangang.net/2016/07/09/php全栈学习路线/</id>
+    <published>2016-07-09T04:07:49.000Z</published>
+    <updated>2020-07-04T04:19:25.629Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="web端"><a href="#web端" class="headerlink" title="web端"></a>web端</h2><p><a href="https://laravel.com/" target="_blank" rel="noopener">laravel</a> &amp;&amp;  <a href="http://laravel-china.org/docs/5.1" target="_blank" rel="noopener">文档</a></p><figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Laravel是一套简洁、优雅的PHP Web开发框架(PHP Web Framework)。</span><br><span class="line">它可以让你从面条一样杂乱的代码中解脱出来<span class="comment">;</span></span><br><span class="line">它可以帮你构建一个完美的网络APP，而且每行代码都可以简洁、富于表达力。</span><br></pre></td></tr></table></figure><a id="more"></a><h2 id="api端"><a href="#api端" class="headerlink" title="api端"></a>api端</h2><p><a href="https://lumen.laravel.com/" target="_blank" rel="noopener">lumen</a> &amp;&amp;  <a href="http://lumen.laravel-china.org/docs" target="_blank" rel="noopener">文档</a></p><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Lumen</span> 是一个由 Laravel 组件搭建而成的微框架，由 Laravel 官方维护。</span><br><span class="line">Lumen 为速度而生，是当前最快的 PHP 框架之一，甚至比类似的微框架 Silex 速度还要快。</span><br></pre></td></tr></table></figure><h2 id="前端"><a href="#前端" class="headerlink" title="前端"></a>前端</h2><p><a href="http://cn.vuejs.org/" target="_blank" rel="noopener">vue.js</a> &amp;&amp; <a href="http://cn.vuejs.org/guide/index.html" target="_blank" rel="noopener">教程</a></p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">一个轻型的 MVVM 框架。</span><br><span class="line">是一个用来开发 web 界面的前端库。</span><br></pre></td></tr></table></figure><h2 id="手机客户端"><a href="#手机客户端" class="headerlink" title="手机客户端"></a>手机客户端</h2><p><a href="http://alibaba.github.io/weex/" target="_blank" rel="noopener">weex</a> &amp;&amp; <a href="http://alibaba.github.io/weex/doc/" target="_blank" rel="noopener">文档</a></p><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Weex能够完美兼顾性能与动态性,让移动开发者通过简捷的前端语法写出<span class="keyword">Native</span>级别的性能体验,</span><br><span class="line">并支持iOS、安卓、YunOS及Web等多端部署。</span><br></pre></td></tr></table></figure><h2 id="tcp"><a href="#tcp" class="headerlink" title="tcp"></a>tcp</h2><p><a href="http://www.workerman.net/" target="_blank" rel="noopener">workerman</a> &amp;&amp; <a href="http://doc3.workerman.net/" target="_blank" rel="noopener">手册</a>   </p><figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Workerman是一款纯PHP开发的开源高性能的PHP <span class="built_in">socket</span> 服务器框架。</span><br><span class="line">被广泛的用于手机app、手游服务端、网络游戏服务器、聊天室服务器、硬件通讯服务器、智能家居、车联网、物联网等领域的开发。</span><br><span class="line">支持TCP长连接，支持Websocket、HTTP等协议，支持自定义协议。</span><br><span class="line">基于workerman开发者可以更专注于业务逻辑开发，不必再为PHP Socket底层开发而烦恼。</span><br></pre></td></tr></table></figure><p><a href="http://www.swoole.com/" target="_blank" rel="noopener">swoole</a> &amp;&amp; <a href="http://wiki.swoole.com/" target="_blank" rel="noopener">文档</a></p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">重新定义PHP的异步、并行、高性能网络通信引擎，</span><br><span class="line">使用纯C语言编写，提供了PHP语言的异步多线程服务器，</span><br><span class="line">异步TCP/UDP网络客户端，异步MySQL，异步Redis，数据库连接池，</span><br><span class="line">AsyncTask，消息队列，毫秒定时器，异步文件读写，异步DNS查询。</span><br></pre></td></tr></table></figure><h2 id="服务器搭建部署"><a href="#服务器搭建部署" class="headerlink" title="服务器搭建部署"></a>服务器搭建部署</h2><p><a href="https://www.docker.com/" target="_blank" rel="noopener">docker</a> &amp;&amp; <a href="https://yeasy.gitbooks.io/docker_practice/content/" target="_blank" rel="noopener">Docker —— 从入门到实践</a></p><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Docker</span> 是一个开源的应用容器引擎，</span><br><span class="line">让开发者可以打包他们的应用以及依赖包到一个可移植的容器中，</span><br><span class="line">然后发布到任何流行的 Linux 机器上，也可以实现虚拟化。</span><br></pre></td></tr></table></figure><h2 id="日志系统"><a href="#日志系统" class="headerlink" title="日志系统"></a>日志系统</h2><p><a href="https://getsentry.com/" target="_blank" rel="noopener">sentry</a> &amp;&amp; <a href="https://docs.getsentry.com/hosted/" target="_blank" rel="noopener">docs</a></p><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Sentry</span> 是一个实时的事件日志和聚合平台,基于 Django 构建。</span><br></pre></td></tr></table></figure><h2 id="桌面端"><a href="#桌面端" class="headerlink" title="桌面端"></a>桌面端</h2><p><a href="http://electron.atom.io/" target="_blank" rel="noopener">electron</a>  &amp;&amp; <a href="https://github.com/electron/electron/tree/master/docs-translations/zh-CN" target="_blank" rel="noopener">文档</a></p><figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Electron 框架的前身是 Atom <span class="keyword">Shell</span><span class="bash">,可以让你写使用 JavaScript,HTML 和CSS 构建跨平台的桌面应用程序。</span></span><br></pre></td></tr></table></figure><h2 id="版本管理"><a href="#版本管理" class="headerlink" title="版本管理"></a>版本管理</h2><p><a href="https://bingohuang.gitbooks.io/progit2/content/" target="_blank" rel="noopener">git</a></p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Git是一款免费、开源的分布式版本控制系统，用于敏捷高效地处理任何或小或大的项目。</span><br></pre></td></tr></table></figure><!--## 压力测试[Apache Benchmark](https://httpd.apache.org/docs/2.4/programs/ab.html)<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ab的全称是ApacheBench，是 Apache 附带的一个小工具，专门用于 HTTP<span class="built_in"> Server </span>的benchmark testing，可以同时模拟多个并发请求。</span><br></pre></td></tr></table></figure><p>–&gt;</p>-->]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;web端&quot;&gt;&lt;a href=&quot;#web端&quot; class=&quot;headerlink&quot; title=&quot;web端&quot;&gt;&lt;/a&gt;web端&lt;/h2&gt;&lt;p&gt;&lt;a href=&quot;https://laravel.com/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;laravel&lt;/a&gt; &amp;amp;&amp;amp;  &lt;a href=&quot;http://laravel-china.org/docs/5.1&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;文档&lt;/a&gt;&lt;/p&gt;
+&lt;figure class=&quot;highlight abnf&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;Laravel是一套简洁、优雅的PHP Web开发框架(PHP Web Framework)。&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;它可以让你从面条一样杂乱的代码中解脱出来&lt;span class=&quot;comment&quot;&gt;;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;它可以帮你构建一个完美的网络APP，而且每行代码都可以简洁、富于表达力。&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+    
+    </summary>
+    
+    
+      <category term="php" scheme="http://blog.huangang.net/tags/php/"/>
+    
+      <category term="全栈" scheme="http://blog.huangang.net/tags/%E5%85%A8%E6%A0%88/"/>
+    
+  </entry>
+  
+</feed>

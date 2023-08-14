@@ -1,0 +1,49 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta name="generator" content="Hexo 3.9.0"><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> docker容器启动后添加端口映射 · zorro_ku_o's blog</title><meta name="description" content="docker容器启动后添加端口映射 - zorro_ku_o"><meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="X-Frame-Options" content="deny"><link rel="short icon" href="/favicon.png"><link rel="stylesheet" href="/css/apollo.css"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">博客</a></li><li class="nav-list-item"><a href="/about.html" target="_self" class="nav-list-link">关于</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">归档</a></li><li class="nav-list-item"><a href="http://weibo.com/zhanghuangang/" target="_blank" class="nav-list-link">微博</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><section class="container"><div class="post"><article class="post-block"><h1 class="post-title">docker容器启动后添加端口映射</h1><div class="post-info">2017年1月6日<a href="https://my.oschina.net/u/266752/blog/541433" target="_blank" title="https://my.oschina.net/u/266752/blog/541433" class="post-from">转载 · 原文地址</a></div><div class="post-content"><h2 id="概要"><a href="#概要" class="headerlink" title="概要"></a>概要</h2><p>网上有许多人在查找关于容器启动后能否进行端口映射的问题。我曾经也问过度娘，很遗憾我没找到。本文就这个问题给出一个解决方法，旨在抛砖引玉。本文的思路是使用iptables的端口转发，这也是docker端口映射内部的实现机制，只不过我是显示地写出来罢了，为的就是让查找这个问题的人对docker的端口映射有一个直观的了解。</p>
+<a id="more"></a> 
+<p><strong>结论：容器启动后是可以添加端口映射的，但不建议手工添加，最好使用docker提供的功能。</strong></p>
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><p>创建两个容器并进行了端口映射，结果如图所示：</p>
+<p><img src="http://huangang.pupued.com/131229_OhXt_266752.png" alt></p>
+<p>假如，我start一个容器，其内部IP为172.17.0.5，并在容器内部启动了80端口。</p>
+<p>FORWARD规则链我们不用管它，docker已经帮我们写好了，我们只需要关心NAT中的几条链即可。</p>
+<p>查看NAT表中的PREROUTING链</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iptables -t<span class="built_in"> nat </span>--list-rules POSTROUTING</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://huangang.pupued.com/131753_i0yc_266752.png" alt></p>
+<p>从上面可以看出，iptables将满足条件的数据都转发到了DOCKER链上去了。</p>
+<p>查看NAT表中的DOCKER链</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iptables -t<span class="built_in"> nat </span>--list-rules DOCKER</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://huangang.pupued.com/132524_5fkC_266752.png" alt></p>
+<p>仿照上图，我们添加一条自己的映射规则，将宿主的8082端口映射到172.17.0.5的80端口上去，规则如下：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iptables -t<span class="built_in"> nat </span>-A DOCKER ! -i docker0 -p tcp -m tcp --dport 8082 -j DNAT --to-destination 172.17.0.5:80</span><br></pre></td></tr></table></figure>
+
+<p>查看NAT表中的POSTROUTING链<br><img src="http://huangang.pupued.com/132027_kvzk_266752.png" alt></p>
+<p>仿照上图中的规则，书写的规则如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iptables -t nat -A POSTROUTING -s 172.17.0.5/32 -d 172.17.0.5/32 -p tcp -m tcp --dport 80 -j  MASQUERADE</span><br></pre></td></tr></table></figure>
+
+<p>查看FILTER表中的DOCKER链</p>
+<figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iptables <span class="comment">--list-rules DOCKER</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="http://huangang.pupued.com/133616_vQYj_266752.png" alt></p>
+<p>仿照上图书写规则如下：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iptables -t<span class="built_in"> filter </span>-A DOCKER -d 172.17.0.5/32 ! -i docker0 -o docker0 -p tcp -m tcp --dport 80 -j ACCEPT</span><br></pre></td></tr></table></figure>
+
+<h2 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h2><p>虽然IP为172.17.0.5的容器没有开启端口映射，如下图所示：<br><img src="http://huangang.pupued.com/134008_c2g8_266752.png" alt></p>
+<p>但我们依然能够通过访问宿主机(192.168.78.238)的8082端口来访问172.17.0.5的80端口，效果如下：</p>
+<p><img src="http://huangang.pupued.com/134500_g6vj_266752.png" alt></p>
+<p>使用此方法有一个缺点，不能访问localhost:8082，也就是说如果想对localhost也进行转发，需要进行额外的配置。</p>
+<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>建议大家不要像我这样去做端口映射，我这么做只是为了阐述标题。</p>
+<p>如果大家在容器中添加了一些东西，并开启了端口，同时呢，又想多复制几个这样的容器。建议大家把容器提交成镜像，然后使用docker提供的端口映射功能。</p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>如果上面命令不小心添加错了,把<code>-A</code>改成<code>-D</code>,如下面</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">iptables -t<span class="built_in"> nat </span>-D DOCKER ! -i docker0 -p tcp -m tcp --dport 8082 -j DNAT --to-destination 172.17.0.5:80</span><br><span class="line">iptables -t<span class="built_in"> nat </span>-D POSTROUTING -s 172.17.0.5/32 -d 172.17.0.5/32 -p tcp -m tcp --dport 80 -j  MASQUERADE</span><br><span class="line">iptables -t<span class="built_in"> filter </span>-D DOCKER -d 172.17.0.5/32 ! -i docker0 -o docker0 -p tcp -m tcp --dport 80 -j ACCEPT</span><br></pre></td></tr></table></figure>
+
+<p>这样就能把你写错或者不需要的规则删除</p>
+</div><div class="tag"></div>标签:[<a href="/tags/docker/">docker</a>,<a href="/tags/iptables/">iptables</a>]</article></div></section><footer><div class="paginator"><a href="/2017/05/13/centos7-安装-docker-composer/" class="prev">上一篇</a><a href="/2016/10/30/js中let和var定义变量的区别/" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'blog-huangang-net';
+var disqus_identifier = '2017/01/06/docker容器启动后添加端口映射/';
+var disqus_title = 'docker容器启动后添加端口映射';
+var disqus_url = 'http://blog.huangang.net/2017/01/06/docker容器启动后添加端口映射/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//blog-huangang-net.disqus.com/count.js" async></script><div class="copyright"><p>© 2014 - 2023 <a href="http://blog.huangang.net">zorro_ku_o</a>, unless otherwise noted.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.6.1/MathJax.js?config=TeX-MML-AM_CHTML"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-72484043-1",'auto');ga('send','pageview');</script><a href="https://github.com/huangang"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"></a></body></html>
